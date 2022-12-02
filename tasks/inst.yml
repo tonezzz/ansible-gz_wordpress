@@ -1,0 +1,22 @@
+---
+
+- debug: var=opts_inst
+#- meta: end_play
+
+- name: Extract Wordpress files
+  when: opts_inst.sites is defined 
+  loop: "{{opts_inst.sites}}"
+  loop_control: {loop_var: inst_item}
+  vars:
+    opts_inst_site:
+      to_do: "{{inst_item.to_do}}"
+      src: "{{ inst_item.src_path }}wp-{{inst_item.wp_version}}.zip"
+      wp_dir: "{{inst_item.wp_dir}}"
+      site_dir: "{{inst_item.site_dir}}"
+      remote_src: yes
+      file_acl: "{{inst_item.file_acl}}"
+      wp_cfg: "{{inst_item.wp_cfg}}"
+      #site_info: "{{inst_item}}"
+      #site_dir: "/var/www/{{inst_item.apache2.servername}}/htdocs"
+  include_tasks: inst_site.yml
+  #debug: var=opts_inst_site

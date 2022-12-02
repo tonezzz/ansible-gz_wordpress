@@ -1,0 +1,21 @@
+---
+
+- name: wordpress my_opts
+  tags: [check, wordpress_prepare]
+  block:
+  - debug: var=gz_wordpress_config
+  - debug: var=opts_wp
+
+#- debug: var=my_opts
+- {name: WP src    ,when: opts_wp.src is defined    ,vars: {opts_src:   "{{ gz_wordpress_config.src     | combine(opts_wp.src,recursive=True) }}"} ,include_tasks: src.yml }
+- {name: WP inst   ,when: opts_wp.inst is defined   ,vars: {opts_inst:  "{{ gz_wordpress_config.inst    | combine(opts_wp.inst,recursive=True) }}"} ,include_tasks: inst.yml }
+#- {name: WP config ,when: opts_wp.config is defined ,vars: {opts_config: "{{ gz_wordpress_config.config | combine(opts_wp.config,recursive=True) }}"} ,include_tasks: config.yml }
+
+#- {name: wp_config ,when: args.wp_config is defined ,include_tasks: wp_config.yml }
+
+#- {name: Src files ,include_tasks: wp_src.yml}
+#- {name: Cfg files ,include_tasks: wp_cfg.yml}
+
+#- {name: Rem sites  ,when: args.rem is defined args.rem.sites is defined ,include_tasks: rem_sites.yml }
+#- {name: Add sites  ,when: (args.add is defined) and (args.add.sites is defined) ,include_tasks: add_sites.yml }
+#- {name: Add sites  ,when: (args.add.sites is defined) ,include_tasks: add_sites.yml }

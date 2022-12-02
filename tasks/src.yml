@@ -1,0 +1,53 @@
+---
+
+- name: create src_dir
+  ansible.builtin.file:
+    #path: "{{dir}}/wp-{{ver}}"
+    path: "{{opts_src.dst_dir}}"
+    state: directory
+
+- name: wp load src files
+  when: opts_src.load is defined
+  loop: "{{opts_src.load}}"
+  loop_control: {loop_var: ver }
+  vars:
+    opts_prep:
+      src_url: "{{opts_src.src_url}}"
+      src_file: "wordpress-{{ver}}.zip"
+      dst_dir: "{{opts_src.dst_dir}}"
+      #version: "{{ver}}"
+  get_url: {url: "{{opts_prep.src_url}}/{{opts_prep.src_file}}" ,dest: "{{opts_prep.dst_dir}}" }
+
+- name: wp prepare src files
+  when: opts_src.prepare is defined
+  loop: "{{opts_src.prepare}}"
+  loop_control: {loop_var: ver }
+  vars:
+    opts_prep:
+      #src_url: "{{opts_src.src_url}}"
+      src_dir: "{{opts_src.dst_dir}}"
+      src_file: "wordpress-{{ver}}.zip"
+      dst_dir: "{{opts_src.dst_dir}}/wp-{{ver}}/"
+      dst_file: "wp-{{ver}}.zip"
+      version: "{{ver}}"
+    cmd: >
+      7za x -y -r {{opts_prep.src_dir}}/{{opts_prep.src_file}} wordpress/* -o{{opts_prep.dst_dir}} ;
+      7za a -sdel {{opts_prep.src_dir}}/{{opts_prep.dst_file}} {{opts_prep.dst_dir}}wordpress/* ;
+  shell: "{{cmd}}"
+
+- name: wp src cleanup
+  when: opts_src.prepare is defined
+  loop: "{{opts_src.prepare}}"
+  loop_control: {loop_var: ver }
+  vars:
+    opts_prep:
+      #src_url: "{{opts_src.src_url}}"
+      #src_dir: "{{opts_src.dst_dir}}"
+      #src_file: "wordpress-{{ver}}.zip"
+      dst_dir: "{{opts_src.dst_dir}}/wp-{{ver}}/"
+      #dst_file: "wp-{{ver}}.zip"
+      #version: "{{ver}}"
+  ansible.builtin.file:
+    path: "{{opts_prep.dst_dir}}"
+    state: absent
+

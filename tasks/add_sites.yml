@@ -1,0 +1,9 @@
+---
+
+- name: Add sites
+  when: args.add.sites is defined
+  loop: "{{args.add.sites}}"
+  loop_control: {loop_var: site}
+  #debug: msg={{site}}
+  include_tasks: add_site.yml
+  #tags: [wordpress_wp_config]

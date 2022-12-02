@@ -1,0 +1,20 @@
+---
+
+- name: site prepare
+  tags: [check, apache2_check]
+  block:
+  - set_fact:
+      my_site: "{{ site | combine(gz_wordpress_config.config, recursive=True) }}"
+  #- debug: var=site
+  - debug: var=my_site
+  #- meta: end_play 
+
+- name: Create wp-config.php
+  ansible.builtin.template:
+    src: "{{gz_wordpress_config.config.wp_config_tpl}}"
+    dest: "{{my_site.dst_dir}}/wp-config.php"
+
+- name: Create main index
+  ansible.builtin.template:   #Main index
+    src: "{{gz_wordpress_config.config.wp_index_tpl}}"
+    dest: "{{my_site.site_dir}}/index.php"

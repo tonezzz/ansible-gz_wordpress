@@ -1,0 +1,64 @@
+---
+
+#domain
+#- name: Create user
+#  when: (opts_inst_site.to_do.user is defined) and opts_inst_site.acts.user
+#  block:
+#  - name: add group
+#    ansible.builtin.group:
+#      name: "{{ opts_inst_site.group }}"
+#  - name: add user
+#    ansible.builtin.user:
+#      name: "{{ opts_inst_site.owner }}"
+#      group: "{{ opts_inst_site.group }}"
+
+- name: Install WP
+  when: (opts_inst_site.to_do.src is defined) and opts_inst_site.to_do.src
+  block:
+  - name: create WP dir
+    ansible.builtin.file:
+      path: "{{opts_inst_site.wp_dir}}"
+      state: directory
+  - name: Extract a WP site
+    ansible.builtin.unarchive:
+      src:        "{{ opts_inst_site.src}}"
+      dest:       "{{ opts_inst_site.wp_dir}}"
+      remote_src: "{{ opts_inst_site.remote_src | default(omit) }}"
+      owner:      "{{ opts_inst_site.file_acl.owner | default(omit) }}"
+      group:      "{{ opts_inst_site.file_acl.group | default(omit) }}"
+      mode:       "{{ opts_inst_site.file_acl.mode | default(mode) }}"
+
+- name: Configure WP
+  when: (opts_inst_site.to_do.wp_config is defined) and opts_inst_site.to_do.wp_config
+  vars:
+    wp_config_path: "{{opts_inst_site.wp_dir}}wp-config.php"
+  block:
+  - stat: path="{{wp_config_path}}"
+    register: file_check
+  - name: create wp_config.php
+    when: (opts_inst_site.to_do.wp_config=='force') or file_check.stat.exists==false
+    ansible.builtin.template:
+      src: "{{gz_wordpress_config.config.wp_config_tpl}}"
+      dest: "{{wp_config_path}}"
+      owner:      "{{ opts_inst_site.file_acl.owner | default(omit) }}"
+      group:      "{{ opts_inst_site.file_acl.group | default(omit) }}"
+      mode:       "{{ opts_inst_site.file_acl.mode | default(omit) }}"
+
+- debug: var=opts_inst_site
+
+- name: Create site index
+  when: (opts_inst_site.to_do.index is defined) and opts_inst_site.to_do.index #and (opts_inst_site.site_dir != opts_inst_site.wp_dir)
+  vars:
+    wp_index_path: "{{opts_inst_site.site_dir}}/index.php"
+  block:
+  - stat: path="{{wp_index_path}}"
+    register: file_check
+  - name: create site index
+    when: (opts_inst_site.to_do.index=='force') or file_check.stat.exists==false
+    ansible.builtin.template:   #Main index
+      src: "{{gz_wordpress_config.config.wp_index_tpl}}"
+      dest: "{{wp_index_path}}"
+      owner:      "{{ opts_inst_site.file_acl.owner | default(omit) }}"
+      group:      "{{ opts_inst_site.file_acl.group | default(omit) }}"
+      mode:       "{{ opts_inst_site.file_acl.mode | default(omit) }}"
+

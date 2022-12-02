@@ -1,0 +1,31 @@
+---
+
+- debug: var=opts_config
+
+- name: Config Wordpress sites
+  when: opts_config.sites is defined
+  loop: "{{opts_config.sites}}"
+  loop_control: {loop_var: inst_item }
+  #vars:
+  #  opts_site:
+  #    #src: "{{ inst_item.src_path | default(opts_config.src_path) }}wp-{{inst_item.wp.version}}.zip"
+  #    wp_config: yes
+  #    dest: "{{opts_config.www_root}}{{inst_item.domain}}/htdocs{{inst_item.wp.dir}}/"
+  #    site: "{{inst_item}}"
+  #debug: var=inst_item
+  #debug: var=dest
+  vars:
+    site_dir: "/var/www/{{inst_item.domain}}/htdocs"
+    site:
+      site_dir: "{{site_dir}}"
+      dst_dir: "{{opts_config.www_root}}{{inst_item.domain}}/htdocs{{inst_item.wp.dir}}/"
+      wp_index:
+      wp_cfg:
+        wp_home: https://{{inst_item.domain}}
+        wp_siteurl: https://{{inst_item.domain}}/wp
+        db_host: localhost
+        db_name: "{{inst_item.name}}"
+        db_user: "{{inst_item.user}}"
+        db_pass: "{{inst_item.pass}}"
+        table_prefix: wp_
+  include_tasks: config_site.yml

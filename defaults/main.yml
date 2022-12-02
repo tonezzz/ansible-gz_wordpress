@@ -1,0 +1,12 @@
+---
+
+gz_wordpress_config:
+  inst: {}
+  src:
+    src_url: 'https://wordpress.org' #/wordpress-' #6.0.zip
+    dst_dir: '/var/www/gizmo/wordpress/'
+  wordpress:
+    src_path: '/var/www/gizmo/wordpress/'
+  config:
+    wp_config_tpl: wp-config.php.j2
+    wp_index_tpl: index.php.j2
