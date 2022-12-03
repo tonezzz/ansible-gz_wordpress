@@ -35,6 +35,7 @@
   block:
   - stat: path="{{wp_config_path}}"
     register: file_check
+
   - name: create wp_config.php
     when: (opts_inst_site.to_do.wp_config=='force') or file_check.stat.exists==false
     ansible.builtin.template:
@@ -43,8 +44,6 @@
       owner:      "{{ opts_inst_site.file_acl.owner | default(omit) }}"
       group:      "{{ opts_inst_site.file_acl.group | default(omit) }}"
       mode:       "{{ opts_inst_site.file_acl.mode | default(omit) }}"
-
-- debug: var=opts_inst_site
 
 - name: Create site index
   when: (opts_inst_site.to_do.index is defined) and opts_inst_site.to_do.index #and (opts_inst_site.site_dir != opts_inst_site.wp_dir)
