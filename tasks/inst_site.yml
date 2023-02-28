@@ -18,6 +18,8 @@
   - name: create WP dir
     ansible.builtin.file:
       path: "{{opts_inst_site.wp_dir}}"
+      owner:      "{{ opts_inst_site.file_acl.owner | default(omit) }}"
+      group:      "{{ opts_inst_site.file_acl.group | default(omit) }}"
       state: directory
   - name: Extract a WP site
     ansible.builtin.unarchive:
