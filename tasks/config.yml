@@ -22,7 +22,7 @@
       wp_index:
       wp_cfg:
         wp_home: https://{{inst_item.domain}}
-        wp_siteurl: https://{{inst_item.domain}}/wp
+        wp_siteurl: https://{{inst_item.domain}}wp
         db_host: localhost
         db_name: "{{inst_item.name}}"
         db_user: "{{inst_item.user}}"

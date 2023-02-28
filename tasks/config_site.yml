@@ -9,12 +9,17 @@
   - debug: var=my_site
   #- meta: end_play 
 
+- name: Create wp dir
+  ansible.builtin.file:
+    path: "{{my_site.dst_dir}}"
+    state: directory
+    
 - name: Create wp-config.php
   ansible.builtin.template:
     src: "{{gz_wordpress_config.config.wp_config_tpl}}"
-    dest: "{{my_site.dst_dir}}/wp-config.php"
+    dest: "{{my_site.dst_dir}}wp-config.php"
 
 - name: Create main index
   ansible.builtin.template:   #Main index
     src: "{{gz_wordpress_config.config.wp_index_tpl}}"
-    dest: "{{my_site.site_dir}}/index.php"
+    dest: "{{my_site.site_dir}}index.php"
