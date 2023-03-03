@@ -1,0 +1,34 @@
+---
+
+- name: Set password for an account
+  vars:
+    opts:
+      db_table: 'wp_users'
+    set_opts: "{{ opts | combine(opts_set,recursive=true) }}"
+  block:
+  - debug: var=set_opts
+
+  - name: Check password
+    community.mysql.mysql_query:
+      login_db: "{{set_opts.db_name}}"
+      login_host: "{{set_opts.db_host}}"
+      query: "select * from {{set_opts.db_table}}"
+    register: result
+  - debug: var=result
+
+  #$P$Bdn2pfjTMCFfI5ryy6oZap21GlaFaj.
+  - name: Change password
+    community.mysql.mysql_query:
+      login_db: "{{set_opts.db_name}}"
+      login_host: "{{set_opts.db_host}}"
+      query: "update {{set_opts.db_table}} set user_pass='{{set_opts.wp_pass}}' where user_login='{{set_opts.wp_user}}'"
+    register: result
+  - debug: var=result
+
+  - name: Check password
+    community.mysql.mysql_query:
+      login_db: "{{set_opts.db_name}}"
+      login_host: "{{set_opts.db_host}}"
+      query: "select * from {{set_opts.db_table}}"
+    register: result
+  - debug: var=result
